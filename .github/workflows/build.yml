@@ -1,0 +1,29 @@
+name: Build EPUB Book
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # Cho phép bấm nút chạy thủ công trên web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Generate EPUB
+        run: |
+          # Lệnh gom toàn bộ file markdown thành file sach.epub (có mục lục tự động)
+          pandoc README.md book/*.md docs/*.md -o cam-nang-song.epub --toc || pandoc $(find . -name "*.md") -o cam-nang-song.epub --toc
+
+      - name: Upload EPUB file
+        uses: actions/upload-artifact@v4
+        with:
+          name: cẩm-nang-sống-epub
+          path: cam-nang-song.epub
